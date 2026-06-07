@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
 :root{
   --bg:#080c12;--bg2:#0d1219;--panel:#11161f;--panel2:#161c27;
@@ -151,93 +152,48 @@ h1 .acc{background:linear-gradient(120deg,var(--em),var(--cy));
 @keyframes cardpop{0%{transform:scale(1)}45%{transform:scale(1.04)}100%{transform:scale(1)}}
 .card-popped{animation:cardpop .35s}
 
-/* ===== MIND MAP VIEW ===== */
+/* ===== MIND MAP VIEW (D3) ===== */
 #view-map{overflow:hidden;background:transparent;}
-#mm-canvas{position:absolute;inset:0;width:100%;height:100%;}
-#mm-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
-#mm-nodes{position:absolute;inset:0;transform-origin:0 0;}
+#mm-svg{position:absolute;inset:0;width:100%;height:100%;cursor:grab;display:block;}
+#mm-svg:active{cursor:grabbing;}
+#mm-svg text{user-select:none;-webkit-user-select:none;}
 
-/* Toolbar overlay */
+/* edges */
+.mm-link{fill:none;stroke-linecap:round;transition:stroke .3s,stroke-opacity .3s,stroke-width .3s;}
+
+/* node groups */
+.mm-gnode{cursor:pointer;}
+.mm-gnode .mm-box{transition:transform .18s,filter .18s;}
+.mm-gnode:hover .mm-box{filter:brightness(1.22);}
+.mm-gnode .mm-tag{font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.06em;}
+.mm-gnode .mm-name{font-family:'Sora',sans-serif;font-weight:600;letter-spacing:-.01em;fill:var(--txt);}
+.mm-gnode .mm-sub{font-family:'JetBrains Mono',monospace;letter-spacing:.04em;}
+.mm-badge-bg{fill:var(--amb);}
+.mm-badge-tx{fill:#1a1206;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:8px;letter-spacing:.04em;}
+.mm-check{fill:var(--em);}
+.mm-check-tx{fill:#06140d;font-weight:700;font-size:11px;font-family:'Sora',sans-serif;}
+
+/* Toolbar */
 #mm-toolbar{
-  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
-  display:flex;gap:8px;background:rgba(13,18,25,.9);backdrop-filter:blur(12px);
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+  display:flex;gap:8px;background:rgba(13,18,25,.92);backdrop-filter:blur(12px);
   border:1px solid var(--slate-line);border-radius:14px;padding:8px 12px;z-index:10;
+  flex-wrap:wrap;justify-content:center;max-width:94vw;
 }
 .mm-tbtn{
   font-family:'JetBrains Mono',monospace;font-size:.7rem;
   padding:7px 14px;border-radius:9px;border:1px solid var(--slate-line);
   background:transparent;color:var(--txt-dim);cursor:pointer;transition:.2s;
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
 }
 .mm-tbtn:hover{color:var(--txt);background:var(--slate)}
 #mm-hint{
-  position:absolute;top:18px;left:50%;transform:translateX(-50%);
-  font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;
+  position:absolute;top:16px;left:50%;transform:translateX(-50%);
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.07em;
   color:var(--txt-faint);background:rgba(13,18,25,.7);border:1px solid var(--slate-line);
-  padding:6px 14px;border-radius:99px;pointer-events:none;
-  opacity:1;transition:opacity 1s;
+  padding:6px 14px;border-radius:99px;pointer-events:none;z-index:10;
+  opacity:1;transition:opacity 1s;text-align:center;max-width:92vw;
 }
-
-/* Mind map nodes — rounded rectangles, label INSIDE */
-.mm-node{
-  position:absolute;cursor:pointer;user-select:none;
-  transform:translate(-50%,-50%);
-}
-.mm-node-inner{
-  display:flex;align-items:center;justify-content:center;flex-direction:column;
-  text-align:center;border-radius:14px;transition:.2s;position:relative;
-  box-shadow:0 6px 26px rgba(0,0,0,.55);padding:11px 14px;
-}
-.mm-node:hover .mm-node-inner{transform:translateY(-3px);filter:brightness(1.18);}
-.mm-tag{
-  font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;
-  letter-spacing:.08em;opacity:.85;margin-bottom:3px;
-}
-.mm-name{
-  font-family:'Sora',sans-serif;font-weight:600;line-height:1.18;
-  letter-spacing:-.01em;color:var(--txt);
-}
-/* Root node */
-.mm-root .mm-node-inner{
-  width:150px;
-  background:linear-gradient(155deg,#16273c,#0a1420);
-  border:1.5px solid rgba(34,211,238,.55);
-  box-shadow:0 0 0 1px rgba(34,211,238,.18),0 0 44px -10px rgba(34,211,238,.5),0 10px 34px rgba(0,0,0,.6);
-}
-.mm-root .mm-tag{color:var(--cy)}
-.mm-root .mm-name{font-size:.92rem;font-weight:700;color:var(--cy);letter-spacing:.02em}
-.mm-root .mm-sub{font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--txt-dim);margin-top:4px;letter-spacing:.04em}
-/* Phase nodes */
-.mm-phase .mm-node-inner{width:158px;border:1.5px solid;}
-.mm-phase .mm-name{font-size:.82rem}
-.mm-phase .mm-sub{font-size:.56rem;font-family:'JetBrains Mono',monospace;color:var(--txt-faint);margin-top:4px;text-transform:uppercase;letter-spacing:.08em}
-/* Topic nodes */
-.mm-topic .mm-node-inner{width:150px;border:1px solid;}
-.mm-topic .mm-tag{font-size:.56rem}
-.mm-topic .mm-name{font-size:.74rem;font-weight:500}
-/* Done / exam states */
-.mm-topic.done-topic .mm-node-inner,
-.mm-phase.done-phase .mm-node-inner{
-  box-shadow:0 0 0 2px rgba(16,217,144,.4),0 0 22px -4px rgba(16,217,144,.45),0 6px 18px rgba(0,0,0,.5)!important;
-  border-color:rgba(16,217,144,.6)!important;
-}
-.mm-topic.done-topic .mm-tag{color:var(--em)!important}
-.mm-node.exam-topic .mm-node-inner::after{
-  content:"★ PROVA";position:absolute;top:-9px;right:8px;
-  font-family:'JetBrains Mono',monospace;font-size:.5rem;font-weight:700;letter-spacing:.05em;
-  color:#1a1206;background:var(--amb);padding:2px 7px;border-radius:6px;
-}
-/* Phase color map (tag color + bg tint + border) */
-.mm-p1 .mm-node-inner{background:linear-gradient(155deg,#152536,#0c1622);border-color:rgba(34,211,238,.5);}
-.mm-p1 .mm-tag{color:var(--cy)}
-.mm-p2 .mm-node-inner{background:linear-gradient(155deg,#211a31,#120c1d);border-color:rgba(167,139,250,.5);}
-.mm-p2 .mm-tag{color:var(--pur)}
-.mm-p3 .mm-node-inner{background:linear-gradient(155deg,#241c12,#150d06);border-color:rgba(245,185,74,.5);}
-.mm-p3 .mm-tag{color:var(--amb)}
-.mm-p4 .mm-node-inner{background:linear-gradient(155deg,#152619,#0a160e);border-color:rgba(16,217,144,.5);}
-.mm-p4 .mm-tag{color:var(--em)}
-.mm-p5 .mm-node-inner{background:linear-gradient(155deg,#271527,#150b15);border-color:rgba(244,114,182,.5);}
-.mm-p5 .mm-tag{color:var(--pink)}
 
 /* ===== SLIDE-OVER PANEL ===== */
 .overlay{
@@ -342,13 +298,12 @@ h1 .acc{background:linear-gradient(120deg,var(--em),var(--cy));
 
 <!-- ===== VIEW: MAPA MENTAL ===== -->
 <div class="view" id="view-map">
-  <div id="mm-hint">Arraste para navegar · Scroll para zoom · Clique nos nós para resumos</div>
-  <svg id="mm-svg" xmlns="http://www.w3.org/2000/svg"><g id="mm-edges"></g></svg>
-  <div id="mm-nodes"></div>
+  <div id="mm-hint">Arraste para navegar · Scroll/pinça para zoom · Clique nos nós para resumos</div>
+  <svg id="mm-svg" xmlns="http://www.w3.org/2000/svg"></svg>
   <div id="mm-toolbar">
     <button class="mm-tbtn" onclick="mmReset()">⊙ Centralizar</button>
-    <button class="mm-tbtn" onclick="mmZoom(1.2)">＋ Zoom</button>
-    <button class="mm-tbtn" onclick="mmZoom(0.83)">－ Zoom</button>
+    <button class="mm-tbtn" onclick="mmZoom(1.3)">＋ Zoom</button>
+    <button class="mm-tbtn" onclick="mmZoom(0.77)">－ Zoom</button>
     <button class="mm-tbtn" id="mm-filter-btn" onclick="toggleDoneFilter()">◈ Só pendentes</button>
   </div>
 </div>
@@ -630,7 +585,7 @@ function switchView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.view===v));
   document.getElementById('view-'+v).classList.add('active');
-  if(v==='map'){initMM();renderMMEdgesTransformed();}
+  if(v==='map'){initMM();if(mmInit)setTimeout(()=>mmReset(true),60);}
 }
 
 /* ============================================================
@@ -727,196 +682,196 @@ overlay.addEventListener('click',closePanel);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&currentId)closePanel();});
 
 /* ============================================================
-   MIND MAP
+   MIND MAP — D3 engine (robust pan/zoom/connections)
 ============================================================ */
 let mmInit=false;
-// Pan + zoom state
-let mmX=0,mmY=0,mmScale=1;
-let dragging=false,lastMX=0,lastMY=0;
 let showOnlyPending=false;
+let d3zoom=null, d3svg=null, d3g=null;
+const NODE_W=168, NODE_H=64, ROOT_R=62, PHASE_W=176, PHASE_H=70;
+const COLORS={p1:'#22d3ee',p2:'#a78bfa',p3:'#f5b94a',p4:'#10d990',p5:'#f472b6'};
+const BG={p1:['#152536','#0c1622'],p2:['#211a31','#120c1d'],p3:['#241c12','#150d06'],p4:['#152619','#0a160e'],p5:['#271527','#150b15']};
 
-// Node positions: computed on init
-const mmPositions={};
-
-function initMM(){
-  if(mmInit)return;mmInit=true;
-  const vw=window.innerWidth;
-  const vh=window.innerHeight-58;
-  const cx=vw/2,cy=vh/2;
-
-  // Root
-  mmPositions['root']={x:cx,y:cy};
-
-  // 5 phases arranged in a wide ring around root
-  const phaseR=340;
+// Build graph data (nodes with fixed radial positions + links)
+function buildGraph(){
+  const nodes=[], links=[];
+  // root at origin
+  nodes.push({id:'root',type:'root',x:0,y:0});
+  const phaseR=430, topicR=250;
   PHASES.forEach((ph,i)=>{
-    const angle=(i/PHASES.length)*Math.PI*2 - Math.PI/2;
-    const px=cx+Math.cos(angle)*phaseR;
-    const py=cy+Math.sin(angle)*phaseR;
-    mmPositions['phase-'+ph.n]={x:px,y:py};
-
-    // Topics fan outward from each phase, away from the root
-    const topicR=210;
+    const ang=(i/PHASES.length)*Math.PI*2 - Math.PI/2;
+    const px=Math.cos(ang)*phaseR, py=Math.sin(ang)*phaseR;
+    const pid='phase-'+ph.n;
+    nodes.push({id:pid,type:'phase',color:ph.color,ph,x:px,y:py});
+    links.push({source:'root',target:pid,color:ph.color,topicId:null});
     ph.nodes.forEach((nd,j)=>{
-      const spread=(j-(ph.nodes.length-1)/2)*0.62; // wider angular gap
-      const ta=angle+spread;
+      const spread=(j-(ph.nodes.length-1)/2)*0.52;
+      const ta=ang+spread;
       const tx=px+Math.cos(ta)*topicR;
       const ty=py+Math.sin(ta)*topicR;
-      mmPositions[nd.id]={x:tx,y:ty};
+      nodes.push({id:nd.id,type:'topic',color:ph.color,nd,x:tx,y:ty});
+      links.push({source:pid,target:nd.id,color:ph.color,topicId:nd.id});
     });
   });
-
-  // Start slightly zoomed out so the whole map fits
-  mmScale=0.78;
-  mmX=cx-(cx*mmScale);
-  mmY=(cy)-(cy*mmScale);
-
-  renderMMNodes();
-  setupMMInteractions();
-  renderMMEdgesTransformed();
-  setTimeout(()=>{const h=document.getElementById('mm-hint');if(h)h.style.opacity='0';},3600);
+  return {nodes,links};
 }
+let GRAPH=null;
+function nodeById(id){return GRAPH.nodes.find(n=>n.id===id);}
 
-const PHASE_LABELS=["Fundamentos","Histórica","Máquinas","Autenticação","Acesso"];
+function initMM(){
+  if(mmInit)return; mmInit=true;
+  GRAPH=buildGraph();
 
-function renderMMNodes(){
-  const cont=document.getElementById('mm-nodes');
-  cont.innerHTML='';
+  d3svg=d3.select('#mm-svg');
+  // defs: gradients per phase + root
+  const defs=d3svg.append('defs');
+  function grad(id,c1,c2){
+    const g=defs.append('linearGradient').attr('id',id).attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
+    g.append('stop').attr('offset','0%').attr('stop-color',c1);
+    g.append('stop').attr('offset','100%').attr('stop-color',c2);
+  }
+  Object.keys(BG).forEach(k=>grad('g-'+k,BG[k][0],BG[k][1]));
+  grad('g-root','#16273c','#0a1420');
 
-  // Root node (clickable → overview summary)
-  const root=document.createElement('div');
-  root.className='mm-node mm-root';
-  root.id='mmn-root';
-  root.style.left=mmPositions['root'].x+'px';
-  root.style.top=mmPositions['root'].y+'px';
-  root.innerHTML=`<div class="mm-node-inner">
-    <div class="mm-tag">Mapa mestre</div>
-    <div class="mm-name">Criptografia<br>& Autenticação</div>
-    <div class="mm-sub">clique p/ visão geral</div>
-  </div>`;
-  root.addEventListener('click',()=>openPanel('root'));
-  cont.appendChild(root);
+  d3g=d3svg.append('g');
 
-  PHASES.forEach((ph,i)=>{
-    const pos=mmPositions['phase-'+ph.n];
-    const pnode=document.createElement('div');
-    pnode.className=`mm-node mm-phase mm-${ph.color}`;
-    pnode.id='mmn-phase-'+ph.n;
-    pnode.style.left=pos.x+'px';
-    pnode.style.top=pos.y+'px';
-    pnode.innerHTML=`<div class="mm-node-inner">
-      <div class="mm-tag">FASE ${ph.n}</div>
-      <div class="mm-name">${ph.title}</div>
-      <div class="mm-sub">resumo · ${ph.nodes.length} tópicos</div>
-    </div>`;
-    pnode.addEventListener('click',()=>openPanel('phase-'+ph.n));
-    cont.appendChild(pnode);
+  // ----- LINKS -----
+  d3g.append('g').attr('class','mm-links-layer')
+    .selectAll('line').data(GRAPH.links).join('line')
+    .attr('class','mm-link')
+    .attr('data-topic',d=>d.topicId||'')
+    .attr('x1',d=>nodeById(d.source).x).attr('y1',d=>nodeById(d.source).y)
+    .attr('x2',d=>nodeById(d.target).x).attr('y2',d=>nodeById(d.target).y)
+    .attr('stroke',d=>COLORS[d.color]||'#22d3ee')
+    .attr('stroke-width',d=>d.topicId?1:1.6)
+    .attr('stroke-opacity',d=>d.topicId?0.26:0.4)
+    .attr('stroke-dasharray',d=>d.topicId?'5 5':'none');
 
-    ph.nodes.forEach(nd=>{
-      const tp=mmPositions[nd.id];
-      const tnode=document.createElement('div');
-      tnode.className=`mm-node mm-topic mm-${ph.color}${nd.exam?' exam-topic':''}`;
-      tnode.id='mmn-'+nd.id;
-      tnode.dataset.id=nd.id;
-      tnode.style.left=tp.x+'px';
-      tnode.style.top=tp.y+'px';
-      tnode.innerHTML=`<div class="mm-node-inner">
-        <div class="mm-tag">${nd.icon} ${nd.id}</div>
-        <div class="mm-name">${nd.title}</div>
-      </div>`;
-      tnode.addEventListener('click',()=>openPanel(nd.id));
-      cont.appendChild(tnode);
+  // ----- NODES -----
+  const gn=d3g.append('g').attr('class','mm-nodes-layer')
+    .selectAll('g').data(GRAPH.nodes).join('g')
+    .attr('class',d=>'mm-gnode mm-g-'+d.id.replace(/[^a-z0-9]/gi,'_'))
+    .attr('transform',d=>`translate(${d.x},${d.y})`)
+    .on('click',(e,d)=>{
+      if(d.type==='root')openPanel('root');
+      else if(d.type==='phase')openPanel(d.id);
+      else openPanel(d.id);
     });
+
+  gn.each(function(d){
+    const g=d3.select(this);
+    if(d.type==='root'){
+      g.append('rect').attr('class','mm-box').attr('x',-90).attr('y',-46).attr('width',180).attr('height',92)
+        .attr('rx',16).attr('fill','url(#g-root)').attr('stroke',COLORS.p1).attr('stroke-width',1.6).attr('stroke-opacity',.7);
+      g.append('text').attr('class','mm-tag').attr('text-anchor','middle').attr('y',-22).attr('fill',COLORS.p1).attr('font-size','9px').text('MAPA MESTRE');
+      g.append('text').attr('class','mm-name').attr('text-anchor','middle').attr('y',-2).attr('fill',COLORS.p1).attr('font-size','15px').attr('font-weight','700').text('Criptografia');
+      g.append('text').attr('class','mm-name').attr('text-anchor','middle').attr('y',16).attr('fill',COLORS.p1).attr('font-size','15px').attr('font-weight','700').text('& Autenticação');
+      g.append('text').attr('class','mm-sub').attr('text-anchor','middle').attr('y',34).attr('fill','var(--txt-dim)').attr('font-size','8px').text('clique p/ visão geral');
+    } else if(d.type==='phase'){
+      const w=PHASE_W,h=PHASE_H;
+      g.append('rect').attr('class','mm-box').attr('x',-w/2).attr('y',-h/2).attr('width',w).attr('height',h)
+        .attr('rx',14).attr('fill','url(#g-'+d.color+')').attr('stroke',COLORS[d.color]).attr('stroke-width',1.6).attr('stroke-opacity',.6);
+      g.append('text').attr('class','mm-tag').attr('text-anchor','middle').attr('y',-16).attr('fill',COLORS[d.color]).attr('font-size','9px').text('FASE '+d.ph.n);
+      g.append('text').attr('class','mm-name').attr('text-anchor','middle').attr('y',2).attr('font-size','13px').text(d.ph.title);
+      g.append('text').attr('class','mm-sub').attr('text-anchor','middle').attr('y',20).attr('fill','var(--txt-faint)').attr('font-size','8px').text('RESUMO · '+d.ph.nodes.length+' TÓPICOS');
+    } else {
+      const w=NODE_W,h=NODE_H;
+      g.append('rect').attr('class','mm-box').attr('x',-w/2).attr('y',-h/2).attr('width',w).attr('height',h)
+        .attr('rx',13).attr('fill','url(#g-'+d.color+')').attr('stroke',COLORS[d.color]).attr('stroke-width',1).attr('stroke-opacity',.5);
+      g.append('text').attr('class','mm-tag').attr('text-anchor','middle').attr('y',-15).attr('fill',COLORS[d.color]).attr('font-size','8.5px').text(d.nd.icon+'  '+d.nd.id);
+      // wrap title into up to 2 lines
+      const words=d.nd.title.split(' ');
+      let lines=[],cur='';
+      words.forEach(wd=>{ if((cur+' '+wd).trim().length>20){lines.push(cur.trim());cur=wd;} else cur=(cur+' '+wd).trim(); });
+      if(cur)lines.push(cur);
+      if(lines.length>2){lines=[lines[0],lines.slice(1).join(' ')];}
+      const startY=lines.length>1?2:6;
+      lines.forEach((ln,i)=>{
+        g.append('text').attr('class','mm-name').attr('text-anchor','middle').attr('y',startY+i*14).attr('font-size','11px').attr('font-weight','500').text(ln);
+      });
+      // exam badge
+      if(d.nd.exam){
+        const bg=g.append('g').attr('class','mm-examflag').attr('transform',`translate(${w/2-34},${-h/2-9})`);
+        bg.append('rect').attr('class','mm-badge-bg').attr('width',44).attr('height',15).attr('rx',6);
+        bg.append('text').attr('class','mm-badge-tx').attr('x',22).attr('y',11).attr('text-anchor','middle').text('★ PROVA');
+      }
+    }
   });
 
-  applyMMTransform();
+  // ----- ZOOM / PAN -----
+  d3zoom=d3.zoom().scaleExtent([0.25,2.6])
+    .on('zoom',(e)=>{ d3g.attr('transform',e.transform); });
+  d3svg.call(d3zoom).on('dblclick.zoom',null);
+
+  refreshMMDone();
+  mmReset(true);
+  setTimeout(()=>{const h=document.getElementById('mm-hint');if(h)h.style.opacity='0';},4000);
 }
 
+// Fit the whole graph into view
+function mmReset(instant){
+  if(!d3svg)return;
+  const rect=document.getElementById('mm-svg').getBoundingClientRect();
+  const W=rect.width, H=rect.height;
+  // graph bounds
+  const xs=GRAPH.nodes.map(n=>n.x), ys=GRAPH.nodes.map(n=>n.y);
+  const pad=130;
+  const minX=Math.min(...xs)-pad, maxX=Math.max(...xs)+pad;
+  const minY=Math.min(...ys)-pad, maxY=Math.max(...ys)+pad;
+  const gw=maxX-minX, gh=maxY-minY;
+  const scale=Math.min(W/gw, H/gh, 1.1);
+  const tx=W/2 - scale*(minX+maxX)/2;
+  const ty=H/2 - scale*(minY+maxY)/2;
+  const t=d3.zoomIdentity.translate(tx,ty).scale(scale);
+  const sel=instant?d3svg:d3svg.transition().duration(450);
+  sel.call(d3zoom.transform,t);
+}
+function mmZoom(factor){
+  if(!d3svg)return;
+  d3svg.transition().duration(220).call(d3zoom.scaleBy,factor);
+}
 
-function renderMMEdgesTransformed(){
-  const svg=document.getElementById('mm-edges');
-  svg.innerHTML='';
-  const colorMap={p1:'#22d3ee',p2:'#a78bfa',p3:'#f5b94a',p4:'#10d990',p5:'#f472b6'};
+// Done-state visuals (topics + phase completion)
+function refreshMMDone(){
+  if(!mmInit)return;
   PHASES.forEach(ph=>{
-    const rp=mmPositions['root'];
-    const pp=mmPositions['phase-'+ph.n];
-    const col=colorMap[ph.color];
-    const rx=rp.x*mmScale+mmX,ry=rp.y*mmScale+mmY;
-    const px=pp.x*mmScale+mmX,py=pp.y*mmScale+mmY;
-    const l1=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l1.setAttribute('x1',rx);l1.setAttribute('y1',ry);
-    l1.setAttribute('x2',px);l1.setAttribute('y2',py);
-    l1.setAttribute('stroke',col);l1.setAttribute('stroke-width','1.5');l1.setAttribute('stroke-opacity','.35');
-    svg.appendChild(l1);
+    let allDone=true;
     ph.nodes.forEach(nd=>{
-      const tp=mmPositions[nd.id];
-      const tx=tp.x*mmScale+mmX,ty=tp.y*mmScale+mmY;
+      const sel=d3.select('.mm-g-'+nd.id.replace(/[^a-z0-9]/gi,'_'));
       const isDone=!!done[nd.id];
-      const vis=showOnlyPending&&isDone?false:true;
-      const l2=document.createElementNS('http://www.w3.org/2000/svg','line');
-      l2.setAttribute('x1',px);l2.setAttribute('y1',py);
-      l2.setAttribute('x2',tx);l2.setAttribute('y2',ty);
-      l2.setAttribute('stroke',isDone?'#10d990':col);
-      l2.setAttribute('stroke-width',isDone?'2':'1');
-      l2.setAttribute('stroke-opacity',isDone?'.65':'.28');
-      l2.setAttribute('stroke-dasharray',isDone?'none':'4 4');
-      if(!vis)l2.setAttribute('opacity','0');
-      svg.appendChild(l2);
+      if(!isDone)allDone=false;
+      if(sel.empty())return;
+      const box=sel.select('.mm-box');
+      box.attr('stroke',isDone?COLORS.p4:COLORS[ph.color])
+         .attr('stroke-width',isDone?2:1)
+         .attr('stroke-opacity',isDone?.95:.5);
+      // tag color
+      sel.select('.mm-tag').attr('fill',isDone?COLORS.p4:COLORS[ph.color]);
+      // checkmark
+      sel.select('.mm-doneflag').remove();
+      if(isDone){
+        const fg=sel.append('g').attr('class','mm-doneflag').attr('transform',`translate(${-NODE_W/2+12},${-NODE_H/2})`);
+        fg.append('circle').attr('class','mm-check').attr('r',8).attr('cx',0).attr('cy',0);
+        fg.append('text').attr('class','mm-check-tx').attr('text-anchor','middle').attr('y',4).text('✓');
+      }
     });
+    // phase node highlight
+    const psel=d3.select('.mm-g-phase_'+ph.n);
+    if(!psel.empty()){
+      psel.select('.mm-box').attr('stroke',allDone?COLORS.p4:COLORS[ph.color])
+        .attr('stroke-width',allDone?2.4:1.6).attr('stroke-opacity',allDone?1:.6);
+    }
   });
-}
-
-function setupMMInteractions(){
-  const mapView=document.getElementById('view-map');
-
-  // Drag
-  mapView.addEventListener('mousedown',e=>{
-    if(e.target.closest('.mm-node')||e.target.closest('#mm-toolbar'))return;
-    dragging=true;lastMX=e.clientX;lastMY=e.clientY;
-    mapView.style.cursor='grabbing';
+  // links to done topics turn solid green
+  d3.selectAll('.mm-link').each(function(d){
+    if(!d.topicId)return;
+    const isDone=!!done[d.topicId];
+    d3.select(this)
+      .attr('stroke',isDone?COLORS.p4:COLORS[d.color])
+      .attr('stroke-width',isDone?2:1)
+      .attr('stroke-opacity',isDone?.7:.26)
+      .attr('stroke-dasharray',isDone?'none':'5 5');
   });
-  document.addEventListener('mousemove',e=>{
-    if(!dragging)return;
-    mmX+=(e.clientX-lastMX);mmY+=(e.clientY-lastMY);
-    lastMX=e.clientX;lastMY=e.clientY;
-    applyMMTransform();renderMMEdgesTransformed();
-  });
-  document.addEventListener('mouseup',()=>{dragging=false;if(currentView==='map')document.getElementById('view-map').style.cursor='';});
-
-  // Touch drag
-  let lastTX=0,lastTY=0;
-  mapView.addEventListener('touchstart',e=>{
-    if(e.target.closest('.mm-node')||e.target.closest('#mm-toolbar'))return;
-    lastTX=e.touches[0].clientX;lastTY=e.touches[0].clientY;
-  },{passive:true});
-  mapView.addEventListener('touchmove',e=>{
-    mmX+=(e.touches[0].clientX-lastTX);mmY+=(e.touches[0].clientY-lastTY);
-    lastTX=e.touches[0].clientX;lastTY=e.touches[0].clientY;
-    applyMMTransform();renderMMEdgesTransformed();
-  },{passive:true});
-
-  // Scroll to zoom
-  mapView.addEventListener('wheel',e=>{
-    e.preventDefault();
-    const delta=e.deltaY>0?0.92:1.09;
-    mmZoomAt(delta,e.clientX,e.clientY);
-  },{passive:false});
-}
-
-function mmZoomAt(factor,cx,cy){
-  // Zoom toward cursor
-  mmX=(mmX-cx)*factor+cx;
-  mmY=(mmY-cy)*factor+cy;
-  mmScale=Math.max(0.35,Math.min(2.5,mmScale*factor));
-  applyMMTransform();renderMMEdgesTransformed();
-}
-function mmZoom(f){
-  const vw=window.innerWidth,vh=window.innerHeight;
-  mmZoomAt(f,vw/2,(vh-58)/2+58);
-}
-function mmReset(){
-  mmX=0;mmY=0;mmScale=1;
-  applyMMTransform();renderMMEdgesTransformed();
+  if(showOnlyPending)applyDoneFilter();
 }
 
 function toggleDoneFilter(){
@@ -925,20 +880,19 @@ function toggleDoneFilter(){
   btn.textContent=showOnlyPending?'◉ Mostrar todos':'◈ Só pendentes';
   btn.style.color=showOnlyPending?'var(--em)':'';
   applyDoneFilter();
-  renderMMEdgesTransformed();
 }
 function applyDoneFilter(){
   PHASES.forEach(ph=>{
     ph.nodes.forEach(nd=>{
-      const el=document.getElementById('mmn-'+nd.id);
-      if(el){
-        const hide=showOnlyPending&&done[nd.id];
-        el.style.opacity=hide?'0':'1';
-        el.style.pointerEvents=hide?'none':'auto';
-      }
+      const sel=d3.select('.mm-g-'+nd.id.replace(/[^a-z0-9]/gi,'_'));
+      const linksel=d3.selectAll('.mm-link').filter(d=>d.topicId===nd.id);
+      const hide=showOnlyPending&&done[nd.id];
+      if(!sel.empty())sel.style('opacity',hide?0:1).style('pointer-events',hide?'none':'auto');
+      linksel.style('opacity',hide?0:1);
     });
   });
 }
+window.addEventListener('resize',()=>{ if(mmInit&&currentView==='map')mmReset(true); });
 
 // Init flow progress label total
 document.getElementById('pbCount').textContent='0';
