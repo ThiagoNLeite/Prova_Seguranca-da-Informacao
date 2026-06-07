@@ -178,66 +178,66 @@ h1 .acc{background:linear-gradient(120deg,var(--em),var(--cy));
   opacity:1;transition:opacity 1s;
 }
 
-/* Mind map nodes */
+/* Mind map nodes — rounded rectangles, label INSIDE */
 .mm-node{
   position:absolute;cursor:pointer;user-select:none;
   transform:translate(-50%,-50%);
 }
 .mm-node-inner{
   display:flex;align-items:center;justify-content:center;flex-direction:column;
-  text-align:center;border-radius:50%;transition:.22s;
-  box-shadow:0 4px 24px rgba(0,0,0,.55);
+  text-align:center;border-radius:14px;transition:.2s;position:relative;
+  box-shadow:0 6px 26px rgba(0,0,0,.55);padding:11px 14px;
 }
-.mm-node:hover .mm-node-inner{transform:scale(1.08);}
-.mm-node-label{
-  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.06em;
-  text-align:center;text-transform:uppercase;margin-top:8px;
-  color:var(--txt-dim);white-space:nowrap;pointer-events:none;
-  text-shadow:0 1px 6px rgba(0,0,0,.8);
+.mm-node:hover .mm-node-inner{transform:translateY(-3px);filter:brightness(1.18);}
+.mm-tag{
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;
+  letter-spacing:.08em;opacity:.85;margin-bottom:3px;
+}
+.mm-name{
+  font-family:'Sora',sans-serif;font-weight:600;line-height:1.18;
+  letter-spacing:-.01em;color:var(--txt);
 }
 /* Root node */
 .mm-root .mm-node-inner{
-  width:110px;height:110px;
-  background:radial-gradient(circle at 35% 35%,#1c2e45,#0a1420);
-  border:1.5px solid rgba(34,211,238,.5);
-  box-shadow:0 0 0 1px rgba(34,211,238,.2),0 0 40px -8px rgba(34,211,238,.45),0 8px 32px rgba(0,0,0,.6);
+  width:150px;
+  background:linear-gradient(155deg,#16273c,#0a1420);
+  border:1.5px solid rgba(34,211,238,.55);
+  box-shadow:0 0 0 1px rgba(34,211,238,.18),0 0 44px -10px rgba(34,211,238,.5),0 10px 34px rgba(0,0,0,.6);
 }
-.mm-root .mm-node-inner span{font-size:.7rem;font-weight:700;color:var(--cy);
-  font-family:'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;
-  line-height:1.3;padding:0 14px}
+.mm-root .mm-tag{color:var(--cy)}
+.mm-root .mm-name{font-size:.92rem;font-weight:700;color:var(--cy);letter-spacing:.02em}
+.mm-root .mm-sub{font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--txt-dim);margin-top:4px;letter-spacing:.04em}
 /* Phase nodes */
-.mm-phase .mm-node-inner{
-  width:80px;height:80px;
-  border:1.5px solid;
-}
+.mm-phase .mm-node-inner{width:158px;border:1.5px solid;}
+.mm-phase .mm-name{font-size:.82rem}
+.mm-phase .mm-sub{font-size:.56rem;font-family:'JetBrains Mono',monospace;color:var(--txt-faint);margin-top:4px;text-transform:uppercase;letter-spacing:.08em}
 /* Topic nodes */
-.mm-topic .mm-node-inner{
-  width:56px;height:56px;
-  border:1px solid;
+.mm-topic .mm-node-inner{width:150px;border:1px solid;}
+.mm-topic .mm-tag{font-size:.56rem}
+.mm-topic .mm-name{font-size:.74rem;font-weight:500}
+/* Done / exam states */
+.mm-topic.done-topic .mm-node-inner,
+.mm-phase.done-phase .mm-node-inner{
+  box-shadow:0 0 0 2px rgba(16,217,144,.4),0 0 22px -4px rgba(16,217,144,.45),0 6px 18px rgba(0,0,0,.5)!important;
+  border-color:rgba(16,217,144,.6)!important;
 }
-.mm-topic .mm-node-inner span{font-size:.55rem;font-family:'JetBrains Mono',monospace;
-  letter-spacing:.04em;font-weight:600;padding:0 8px}
-.mm-topic.done-topic .mm-node-inner{
-  box-shadow:0 0 0 3px rgba(16,217,144,.3),0 0 20px -4px rgba(16,217,144,.45),0 4px 16px rgba(0,0,0,.5)!important;
+.mm-topic.done-topic .mm-tag{color:var(--em)!important}
+.mm-node.exam-topic .mm-node-inner::after{
+  content:"★ PROVA";position:absolute;top:-9px;right:8px;
+  font-family:'JetBrains Mono',monospace;font-size:.5rem;font-weight:700;letter-spacing:.05em;
+  color:#1a1206;background:var(--amb);padding:2px 7px;border-radius:6px;
 }
-.mm-topic.exam-topic .mm-node-inner::after{
-  content:"★";position:absolute;top:-5px;right:-5px;
-  font-size:.6rem;color:var(--amb);
-  background:var(--bg);border-radius:50%;width:14px;height:14px;
-  display:grid;place-items:center;border:1px solid var(--amb);
-}
-.mm-topic.exam-topic .mm-node-inner{position:relative;}
-/* Phase color map */
-.mm-p1 .mm-node-inner{background:radial-gradient(circle at 35% 35%,#1e2f45,#0f1b2c);border-color:rgba(34,211,238,.55);color:var(--cy);}
-.mm-p1 .mm-node-inner span{color:var(--cy)}
-.mm-p2 .mm-node-inner{background:radial-gradient(circle at 35% 35%,#271f3a,#150f22);border-color:rgba(167,139,250,.55);color:var(--pur);}
-.mm-p2 .mm-node-inner span{color:var(--pur)}
-.mm-p3 .mm-node-inner{background:radial-gradient(circle at 35% 35%,#2a2018,#180f08);border-color:rgba(245,185,74,.55);color:var(--amb);}
-.mm-p3 .mm-node-inner span{color:var(--amb)}
-.mm-p4 .mm-node-inner{background:radial-gradient(circle at 35% 35%,#1c2e22,#0c1a10);border-color:rgba(16,217,144,.55);color:var(--em);}
-.mm-p4 .mm-node-inner span{color:var(--em)}
-.mm-p5 .mm-node-inner{background:radial-gradient(circle at 35% 35%,#2d1b2e,#160b17);border-color:rgba(244,114,182,.55);color:var(--pink);}
-.mm-p5 .mm-node-inner span{color:var(--pink)}
+/* Phase color map (tag color + bg tint + border) */
+.mm-p1 .mm-node-inner{background:linear-gradient(155deg,#152536,#0c1622);border-color:rgba(34,211,238,.5);}
+.mm-p1 .mm-tag{color:var(--cy)}
+.mm-p2 .mm-node-inner{background:linear-gradient(155deg,#211a31,#120c1d);border-color:rgba(167,139,250,.5);}
+.mm-p2 .mm-tag{color:var(--pur)}
+.mm-p3 .mm-node-inner{background:linear-gradient(155deg,#241c12,#150d06);border-color:rgba(245,185,74,.5);}
+.mm-p3 .mm-tag{color:var(--amb)}
+.mm-p4 .mm-node-inner{background:linear-gradient(155deg,#152619,#0a160e);border-color:rgba(16,217,144,.5);}
+.mm-p4 .mm-tag{color:var(--em)}
+.mm-p5 .mm-node-inner{background:linear-gradient(155deg,#271527,#150b15);border-color:rgba(244,114,182,.5);}
+.mm-p5 .mm-tag{color:var(--pink)}
 
 /* ===== SLIDE-OVER PANEL ===== */
 .overlay{
@@ -542,6 +542,62 @@ const PHASES=[
  ]}
 ];
 
+/* ---- Summaries for parent nodes (root + phases) ---- */
+const ROOT_SUMMARY={
+  phase:"Visão geral · 5 fases",
+  title:"Criptografia & Autenticação",
+  body:`<p class="lead">O conteúdo inteiro da prova em uma frase por fase. Use isto como índice mestre.</p>
+  <div class="deflist">
+  <div class="def"><span class="k">01 · Fundamentos</span><span class="v">O que é cripto, terminologia (6 termos) e o trio Alice/Bob/Eva.</span></div>
+  <div class="def"><span class="k">02 · Histórica</span><span class="v">Cifras manuais: hebraicas, Licurgo, Eratóstenes, e os de prova — Políbio e César.</span></div>
+  <div class="def"><span class="k">03 · Máquinas e Redes</span><span class="v">Jefferson, Enigma/Turing, DES/RSA/PGP, chaves pública vs privada e classificação + XOR.</span></div>
+  <div class="def"><span class="k">04 · Autenticação</span><span class="v">O 1º filtro: conceito, validação mútua, UID/GID e ciclo de sessão.</span></div>
+  <div class="def"><span class="k">05 · Acesso Avançado</span><span class="v">Os 3 fatores (SYK/SYH/SYA), hash/OTP e protocolos (OAuth, Kerberos…).</span></div>
+  </div>
+  <div class="callout"><div class="ct">estratégia</div><p>Os 3 nós com ★ PROVA (Políbio, César, Três Fatores) são os de maior peso. Domine eles primeiro.</p></div>`
+};
+const PHASE_SUMMARY={
+ "01":{phase:"Resumo da Fase 1",title:"Fundamentos Críticos",
+   body:`<p class="lead">A base de tudo. Sem isto, o resto não encaixa.</p>
+   <div class="deflist">
+   <div class="def"><span class="k">⚖️ Equilíbrio</span><span class="v">Cripto não é mágica — é redução de risco. Nenhum sistema é 100% seguro.</span></div>
+   <div class="def"><span class="k">📖 Terminologia</span><span class="v">Texto claro, cifração, texto cifrado, decifração, chave e algoritmo.</span></div>
+   <div class="def"><span class="k">🎭 Trio</span><span class="v">Alice cifra, Bob decifra, Eva intercepta.</span></div>
+   </div>
+   <div class="callout"><div class="ct">a ideia central</div><p>Segurança = equilíbrio entre técnica, risco e contexto.</p></div>`},
+ "02":{phase:"Resumo da Fase 2",title:"Criptografia Histórica",
+   body:`<p class="lead">Cifras feitas à mão — duas delas caem na prova.</p>
+   <div class="deflist">
+   <div class="def"><span class="k">📜 Hebraicas</span><span class="v">ATBASH/ALBAM/ATBAH — substituição por alfabeto reverso. + Phaistos (não decifrado).</span></div>
+   <div class="def"><span class="k">🪵 Licurgo / Eratóstenes</span><span class="v">Transposição mecânica (bastão) e crivo de primos.</span></div>
+   <div class="def"><span class="k">🔢 Políbio ★</span><span class="v">Tomogrâmico: letra → par de coordenadas numa matriz.</span></div>
+   <div class="def"><span class="k">🏛️ César ★</span><span class="v">Monoalfabética, deslocamento cíclico K=3.</span></div>
+   </div>`},
+ "03":{phase:"Resumo da Fase 3",title:"Máquinas e Redes",
+   body:`<p class="lead">A cripto sai do papel e entra na era digital.</p>
+   <div class="deflist">
+   <div class="def"><span class="k">⚙️ Máquinas</span><span class="v">Jefferson, Morse, ASCII, Enigma (rotores) quebrada por Turing + Colossus.</span></div>
+   <div class="def"><span class="k">🌐 Rede</span><span class="v">DES (IBM), RSA (Rivest-Shamir-Adleman), PGP (Zimmerman). Fraca vs forte.</span></div>
+   <div class="def"><span class="k">🗝️ Chaves</span><span class="v">Pública = assimétrica; Privada = segredo compartilhado (simétrica).</span></div>
+   <div class="def"><span class="k">🔀 Classificação</span><span class="v">Código vs Cifra; Transposição vs Substituição; operador XOR.</span></div>
+   </div>`},
+ "04":{phase:"Resumo da Fase 4",title:"Fundamentos de Autenticação",
+   body:`<p class="lead">O primeiro filtro entre o mundo externo e o recurso interno.</p>
+   <div class="deflist">
+   <div class="def"><span class="k">🚪 Conceito</span><span class="v">Verificar identidade antes de liberar privilégio.</span></div>
+   <div class="def"><span class="k">🔁 Mútua</span><span class="v">Usuário valida o sistema (anti-phishing); SO valida componentes.</span></div>
+   <div class="def"><span class="k">🆔 Credenciais</span><span class="v">UID e GID; processos herdam credenciais de quem os invocou.</span></div>
+   <div class="def"><span class="k">⏱️ Sessão</span><span class="v">Login → processos → ações → logout. Sessões isoladas coexistem.</span></div>
+   </div>`},
+ "05":{phase:"Resumo da Fase 5",title:"Técnicas Avançadas de Acesso",
+   body:`<p class="lead">Como autenticar de forma forte na prática moderna.</p>
+   <div class="deflist">
+   <div class="def"><span class="k">🔐 Três Fatores ★</span><span class="v">SYK (sabe), SYH (tem), SYA (é). Combinar = MFA/2FA.</span></div>
+   <div class="def"><span class="k">🔑 Hash & OTP</span><span class="v">Login compara hashes; ataque de dicionário; senhas descartáveis.</span></div>
+   <div class="def"><span class="k">🌍 Protocolos</span><span class="v">Web: OAuth, OpenID, SAML. Rede: Kerberos, LDAP, RADIUS, PAM, NSS.</span></div>
+   </div>`}
+};
+
 /* Build flat lookup */
 const NODES={};
 PHASES.forEach(p=>p.nodes.forEach(n=>NODES[n.id]={...n,phaseColor:p.color,phaseN:p.n}));
@@ -574,7 +630,7 @@ function switchView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.view===v));
   document.getElementById('view-'+v).classList.add('active');
-  if(v==='map'){initMM();renderMMEdges();}
+  if(v==='map'){initMM();renderMMEdgesTransformed();}
 }
 
 /* ============================================================
@@ -625,12 +681,18 @@ const sidepanel=document.getElementById('sidepanel');
 let currentId=null;
 
 function openPanel(id){
-  const nd=NODES[id]; currentId=id;
+  let nd, isSummary=false;
+  if(id==='root'){nd=ROOT_SUMMARY;isSummary=true;}
+  else if(id&&id.startsWith('phase-')){nd=PHASE_SUMMARY[id.replace('phase-','')];isSummary=true;}
+  else nd=NODES[id];
+  currentId=id;
   document.getElementById('spPhase').textContent=nd.phase;
   document.getElementById('spTitle').textContent=nd.title;
   document.getElementById('spBody').innerHTML=nd.body;
   document.getElementById('spBody').scrollTop=0;
-  syncDoneBtn();
+  // Parent summaries don't have a "mark done" button
+  document.getElementById('spDone').style.display=isSummary?'none':'';
+  if(!isSummary)syncDoneBtn();
   overlay.classList.add('open');
   sidepanel.classList.add('open');
   document.body.style.overflow='hidden';
@@ -685,45 +747,54 @@ function initMM(){
   // Root
   mmPositions['root']={x:cx,y:cy};
 
-  // 5 phases arranged in a ring around root
-  const phaseR=190;
+  // 5 phases arranged in a wide ring around root
+  const phaseR=340;
   PHASES.forEach((ph,i)=>{
     const angle=(i/PHASES.length)*Math.PI*2 - Math.PI/2;
     const px=cx+Math.cos(angle)*phaseR;
     const py=cy+Math.sin(angle)*phaseR;
     mmPositions['phase-'+ph.n]={x:px,y:py};
 
-    // Topics in a smaller ring around each phase, spread outward from center
-    const topicR=110;
-    const outerAngle=angle; // topics spread perpendicular to the root-phase line
+    // Topics fan outward from each phase, away from the root
+    const topicR=210;
     ph.nodes.forEach((nd,j)=>{
-      const spread=(j-(ph.nodes.length-1)/2)*0.44; // radians
-      const ta=outerAngle+spread;
+      const spread=(j-(ph.nodes.length-1)/2)*0.62; // wider angular gap
+      const ta=angle+spread;
       const tx=px+Math.cos(ta)*topicR;
       const ty=py+Math.sin(ta)*topicR;
       mmPositions[nd.id]={x:tx,y:ty};
     });
   });
 
+  // Start slightly zoomed out so the whole map fits
+  mmScale=0.78;
+  mmX=cx-(cx*mmScale);
+  mmY=(cy)-(cy*mmScale);
+
   renderMMNodes();
   setupMMInteractions();
-  // fade out hint
-  setTimeout(()=>{const h=document.getElementById('mm-hint');if(h)h.style.opacity='0';},3200);
+  renderMMEdgesTransformed();
+  setTimeout(()=>{const h=document.getElementById('mm-hint');if(h)h.style.opacity='0';},3600);
 }
 
-const PHASE_LABELS=["Fundamentos","Histórica","Máquinas","Autenticação","Acesso Avançado"];
+const PHASE_LABELS=["Fundamentos","Histórica","Máquinas","Autenticação","Acesso"];
 
 function renderMMNodes(){
   const cont=document.getElementById('mm-nodes');
   cont.innerHTML='';
 
-  // Root node
+  // Root node (clickable → overview summary)
   const root=document.createElement('div');
   root.className='mm-node mm-root';
   root.id='mmn-root';
   root.style.left=mmPositions['root'].x+'px';
   root.style.top=mmPositions['root'].y+'px';
-  root.innerHTML=`<div class="mm-node-inner"><span>CRIPTO<br>&<br>AUTH</span></div>`;
+  root.innerHTML=`<div class="mm-node-inner">
+    <div class="mm-tag">Mapa mestre</div>
+    <div class="mm-name">Criptografia<br>& Autenticação</div>
+    <div class="mm-sub">clique p/ visão geral</div>
+  </div>`;
+  root.addEventListener('click',()=>openPanel('root'));
   cont.appendChild(root);
 
   PHASES.forEach((ph,i)=>{
@@ -733,11 +804,12 @@ function renderMMNodes(){
     pnode.id='mmn-phase-'+ph.n;
     pnode.style.left=pos.x+'px';
     pnode.style.top=pos.y+'px';
-    pnode.innerHTML=`<div class="mm-node-inner" style="flex-direction:column">
-      <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.7rem;letter-spacing:.06em">${ph.n}</span>
-      <span style="font-size:.55rem;opacity:.75;letter-spacing:.04em">${PHASE_LABELS[i]}</span>
-    </div>
-    <div class="mm-node-label">${ph.title}</div>`;
+    pnode.innerHTML=`<div class="mm-node-inner">
+      <div class="mm-tag">FASE ${ph.n}</div>
+      <div class="mm-name">${ph.title}</div>
+      <div class="mm-sub">resumo · ${ph.nodes.length} tópicos</div>
+    </div>`;
+    pnode.addEventListener('click',()=>openPanel('phase-'+ph.n));
     cont.appendChild(pnode);
 
     ph.nodes.forEach(nd=>{
@@ -748,9 +820,10 @@ function renderMMNodes(){
       tnode.dataset.id=nd.id;
       tnode.style.left=tp.x+'px';
       tnode.style.top=tp.y+'px';
-      const shortTitle=nd.title.length>18?nd.title.slice(0,17)+'…':nd.title;
-      tnode.innerHTML=`<div class="mm-node-inner"><span>${nd.id}</span></div>
-      <div class="mm-node-label">${shortTitle}</div>`;
+      tnode.innerHTML=`<div class="mm-node-inner">
+        <div class="mm-tag">${nd.icon} ${nd.id}</div>
+        <div class="mm-name">${nd.title}</div>
+      </div>`;
       tnode.addEventListener('click',()=>openPanel(nd.id));
       cont.appendChild(tnode);
     });
@@ -759,83 +832,6 @@ function renderMMNodes(){
   applyMMTransform();
 }
 
-function renderMMEdges(){
-  const svg=document.getElementById('mm-edges');
-  svg.innerHTML='';
-
-  const root=mmPositions['root'];
-  const colorMap={p1:'#22d3ee',p2:'#a78bfa',p3:'#f5b94a',p4:'#10d990',p5:'#f472b6'};
-
-  PHASES.forEach(ph=>{
-    const pp=mmPositions['phase-'+ph.n];
-    const col=colorMap[ph.color];
-    // root → phase
-    const l1=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l1.setAttribute('x1',root.x);l1.setAttribute('y1',root.y);
-    l1.setAttribute('x2',pp.x);l1.setAttribute('y2',pp.y);
-    l1.setAttribute('stroke',col);l1.setAttribute('stroke-width','1.5');
-    l1.setAttribute('stroke-opacity','.35');
-    svg.appendChild(l1);
-
-    ph.nodes.forEach(nd=>{
-      const tp=mmPositions[nd.id];
-      const isDone=!!done[nd.id];
-      const l2=document.createElementNS('http://www.w3.org/2000/svg','line');
-      l2.setAttribute('x1',pp.x);l2.setAttribute('y1',pp.y);
-      l2.setAttribute('x2',tp.x);l2.setAttribute('y2',tp.y);
-      l2.setAttribute('stroke',isDone?'#10d990':col);
-      l2.setAttribute('stroke-width',isDone?'1.5':'1');
-      l2.setAttribute('stroke-opacity',isDone?'.6':'.25');
-      l2.setAttribute('stroke-dasharray',isDone?'none':'4 4');
-      l2.id='edge-'+nd.id;
-      svg.appendChild(l2);
-    });
-  });
-}
-
-function refreshMMDone(){
-  if(!mmInit)return;
-  // Update topic node styles
-  Object.keys(done).forEach(id=>{
-    const el=document.getElementById('mmn-'+id);
-    if(el)el.classList.toggle('done-topic',!!done[id]);
-  });
-  // Re-render edges to update done lines
-  renderMMEdges();
-  // Handle filter
-  if(showOnlyPending)applyDoneFilter();
-}
-
-function applyMMTransform(){
-  const cont=document.getElementById('mm-nodes');
-  const nodes=cont.querySelectorAll('.mm-node');
-  nodes.forEach(n=>{
-    const id=n.id.replace('mmn-','').replace('phase-','');
-    let key=n.id.replace('mmn-','');
-    const p=mmPositions[key]||mmPositions['phase-'+key]||mmPositions['root'];
-    if(!p)return;
-    const sx=(p.x*mmScale+mmX);
-    const sy=(p.y*mmScale+mmY);
-    n.style.left=sx+'px';
-    n.style.top=sy+'px';
-    n.style.transform=`translate(-50%,-50%) scale(${mmScale})`;
-  });
-
-  // Reposition edges
-  const svg=document.getElementById('mm-edges');
-  if(!svg.children.length)return;
-  svg.querySelectorAll('line').forEach(l=>{
-    const ox=parseFloat(l.getAttribute('x1'));
-    const oy=parseFloat(l.getAttribute('y1'));
-    const dx=parseFloat(l.getAttribute('x2'));
-    const dy=parseFloat(l.getAttribute('y2'));
-    // These are original coords — transform
-    l.setAttribute('x1',ox*mmScale+mmX);l.setAttribute('y1',oy*mmScale+mmY);
-    l.setAttribute('x2',dx*mmScale+mmX);l.setAttribute('y2',dy*mmScale+mmY);
-  });
-  // re-render edges from scratch to avoid drift
-  renderMMEdgesTransformed();
-}
 
 function renderMMEdgesTransformed(){
   const svg=document.getElementById('mm-edges');
