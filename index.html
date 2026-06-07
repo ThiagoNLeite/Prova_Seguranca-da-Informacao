@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxograma de Estudo — Criptografia & Autenticação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e14;
+    --bg2:#0d1219;
+    --panel:#11161f;
+    --panel2:#161c27;
+    --slate:#1c2430;
+    --slate-line:#283143;
+    --zinc:#3a4456;
+    --txt:#e6edf3;
+    --txt-dim:#8b97a8;
+    --txt-faint:#5a6678;
+    --emerald:#10d990;
+    --emerald-dim:#0a8f60;
+    --cyan:#22d3ee;
+    --cyan-dim:#0e7490;
+    --amber:#f5b94a;
+    --rose:#f87171;
+    --glow-em:0 0 0 1px rgba(16,217,144,.5), 0 0 24px -4px rgba(16,217,144,.55);
+    --glow-cy:0 0 0 1px rgba(34,211,238,.5), 0 0 22px -4px rgba(34,211,238,.5);
+    --shadow:0 18px 50px -12px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1100px 600px at 80% -8%, rgba(34,211,238,.06), transparent 60%),
+      radial-gradient(900px 600px at 12% 4%, rgba(16,217,144,.06), transparent 55%),
+      var(--bg);
+    color:var(--txt);
+    font-family:'Sora',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:80px;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(40,49,67,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(40,49,67,.25) 1px,transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(circle at 50% 30%,#000,transparent 80%);
+    -webkit-mask-image:radial-gradient(circle at 50% 30%,#000,transparent 80%);
+  }
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:38px 22px 0}
+
+  /* ---------- HEADER ---------- */
+  header{margin-bottom:34px}
+  .kicker{
+    font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.34em;
+    color:var(--cyan);text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  }
+  .kicker::before{content:"";width:30px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+  h1{font-size:clamp(1.9rem,5vw,3.1rem);font-weight:800;line-height:1.04;letter-spacing:-.02em}
+  h1 .accent{background:linear-gradient(120deg,var(--emerald),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--txt-dim);margin-top:14px;font-size:1.02rem;font-weight:300;max-width:640px;line-height:1.5}
+  .examtag{
+    display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+    font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--amber);
+    background:rgba(245,185,74,.08);border:1px solid rgba(245,185,74,.25);
+    padding:8px 14px;border-radius:9px;
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-bar{
+    margin-top:26px;background:var(--panel);border:1px solid var(--slate-line);
+    border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  }
+  .pb-track{flex:1;min-width:200px;height:9px;background:var(--slate);border-radius:99px;overflow:hidden;position:relative}
+  .pb-fill{height:100%;width:0;background:linear-gradient(90deg,var(--emerald-dim),var(--emerald),var(--cyan));border-radius:99px;transition:width .55s cubic-bezier(.4,0,.2,1);box-shadow:0 0 14px rgba(16,217,144,.55)}
+  .pb-label{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--txt-dim);white-space:nowrap}
+  .pb-label b{color:var(--emerald);font-size:1.05rem}
+  .pb-reset{
+    background:transparent;border:1px solid var(--slate-line);color:var(--txt-faint);
+    font-family:'JetBrains Mono',monospace;font-size:.72rem;padding:7px 12px;border-radius:8px;cursor:pointer;transition:.2s;
+  }
+  .pb-reset:hover{color:var(--rose);border-color:var(--rose)}
+
+  /* ---------- FLOW ---------- */
+  .phase{margin-top:46px;position:relative}
+  .phase-head{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+  .phase-num{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.92rem;
+    width:46px;height:46px;flex:none;border-radius:13px;display:grid;place-items:center;
+    background:var(--panel2);border:1px solid var(--slate-line);color:var(--cyan);
+    box-shadow:inset 0 0 18px rgba(34,211,238,.07);
+  }
+  .phase-title{font-size:1.28rem;font-weight:700;letter-spacing:-.01em}
+  .phase-title small{display:block;font-family:'JetBrains Mono',monospace;font-weight:400;font-size:.7rem;letter-spacing:.22em;color:var(--txt-faint);text-transform:uppercase;margin-top:3px}
+  .phase-line{flex:1;height:1px;background:linear-gradient(90deg,var(--slate-line),transparent)}
+
+  .nodes{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:16px;position:relative}
+
+  .node{
+    position:relative;cursor:pointer;text-align:left;
+    background:linear-gradient(150deg,var(--panel),var(--bg2));
+    border:1px solid var(--slate-line);border-radius:16px;padding:18px 18px 16px;
+    transition:transform .22s cubic-bezier(.34,1.4,.5,1),border-color .22s,box-shadow .22s;
+    overflow:hidden;font-family:inherit;color:inherit;width:100%;
+  }
+  .node::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:var(--zinc);transition:.22s;
+  }
+  .node:hover{transform:translateY(-4px);border-color:var(--zinc);box-shadow:var(--shadow)}
+  .node:hover::before{background:var(--cyan)}
+  .node-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .node-id{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--txt-faint);letter-spacing:.08em}
+  .node-icon{font-size:1.15rem;filter:grayscale(.2)}
+  .node-title{font-size:1.02rem;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+  .node-hint{margin-top:9px;font-size:.8rem;color:var(--txt-dim);font-weight:300;line-height:1.4}
+  .node-state{
+    margin-top:13px;display:flex;align-items:center;gap:7px;
+    font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--txt-faint);text-transform:uppercase;letter-spacing:.1em;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--zinc);transition:.25s;box-shadow:0 0 0 0 transparent}
+
+  .node.exam{border-color:rgba(245,185,74,.3)}
+  .node.exam::before{background:var(--amber)}
+  .node .exam-flag{
+    position:absolute;top:0;right:0;font-family:'JetBrains Mono',monospace;font-size:.6rem;
+    background:var(--amber);color:#1a1206;font-weight:700;padding:3px 9px;border-bottom-left-radius:10px;letter-spacing:.05em;
+  }
+  .node.exam.done .exam-flag{opacity:.45}
+
+  /* DONE state */
+  .node.done{border-color:rgba(16,217,144,.45);box-shadow:var(--glow-em)}
+  .node.done::before{background:var(--emerald)}
+  .node.done .dot{background:var(--emerald);box-shadow:0 0 0 4px rgba(16,217,144,.16)}
+  .node.done .node-state{color:var(--emerald)}
+  .node.done .node-title{color:#cfeede}
+
+  .connector{display:flex;justify-content:center;padding:8px 0 0}
+  .connector svg{opacity:.5}
+
+  /* ---------- MODAL / SLIDE-OVER ---------- */
+  .overlay{
+    position:fixed;inset:0;z-index:50;background:rgba(4,7,11,.72);backdrop-filter:blur(5px);
+    opacity:0;pointer-events:none;transition:opacity .3s;
+  }
+  .overlay.open{opacity:1;pointer-events:auto}
+  .panel{
+    position:fixed;top:0;right:0;height:100%;width:min(560px,100%);z-index:60;
+    background:linear-gradient(180deg,var(--panel2),var(--bg));
+    border-left:1px solid var(--slate-line);box-shadow:-30px 0 80px -20px rgba(0,0,0,.8);
+    transform:translateX(102%);transition:transform .42s cubic-bezier(.4,0,.2,1);
+    display:flex;flex-direction:column;
+  }
+  .panel.open{transform:translateX(0)}
+  .panel-bar{height:4px;background:linear-gradient(90deg,var(--emerald),var(--cyan))}
+  .panel-head{padding:30px 32px 22px;border-bottom:1px solid var(--slate-line);position:relative}
+  .panel-phase{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);margin-bottom:12px}
+  .panel-title{font-size:1.55rem;font-weight:700;line-height:1.12;letter-spacing:-.02em;padding-right:36px}
+  .panel-close{
+    position:absolute;top:26px;right:28px;width:36px;height:36px;border-radius:10px;
+    background:var(--slate);border:1px solid var(--slate-line);color:var(--txt-dim);
+    font-size:1.1rem;cursor:pointer;display:grid;place-items:center;transition:.2s;
+  }
+  .panel-close:hover{color:var(--txt);border-color:var(--zinc);transform:rotate(90deg)}
+  .panel-body{padding:26px 32px 30px;overflow-y:auto;flex:1;line-height:1.62}
+  .panel-body::-webkit-scrollbar{width:9px}
+  .panel-body::-webkit-scrollbar-thumb{background:var(--slate-line);border-radius:9px}
+  .panel-body p{color:var(--txt-dim);font-weight:300;margin-bottom:16px}
+  .panel-body strong{color:var(--txt);font-weight:600}
+  .panel-body .lead{color:var(--txt);font-size:1.05rem;font-weight:400}
+  .panel-body h4{
+    font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--emerald);margin:26px 0 12px;display:flex;align-items:center;gap:9px;
+  }
+  .panel-body h4::before{content:"▹";color:var(--cyan)}
+  .deflist{display:flex;flex-direction:column;gap:10px;margin:6px 0 4px}
+  .def{background:var(--panel);border:1px solid var(--slate-line);border-radius:11px;padding:13px 15px}
+  .def .k{font-weight:600;color:var(--cyan);font-size:.94rem;margin-bottom:3px;display:block}
+  .def .v{color:var(--txt-dim);font-size:.9rem;font-weight:300;line-height:1.5}
+  .callout{
+    border-left:3px solid var(--amber);background:rgba(245,185,74,.07);
+    padding:13px 16px;border-radius:0 11px 11px 0;margin:18px 0;
+  }
+  .callout .ct{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;font-weight:700}
+  .callout p{color:#e9d9b8;margin:0;font-size:.92rem}
+  .keytag{display:inline-block;font-family:'JetBrains Mono',monospace;background:var(--slate);border:1px solid var(--slate-line);color:var(--cyan);padding:2px 9px;border-radius:7px;font-size:.84rem;font-weight:600}
+
+  .panel-foot{padding:20px 32px;border-top:1px solid var(--slate-line);background:rgba(10,14,20,.6)}
+  .btn-done{
+    width:100%;padding:15px;border-radius:13px;border:1px solid var(--emerald-dim);
+    background:linear-gradient(120deg,rgba(16,217,144,.12),rgba(34,211,238,.1));
+    color:var(--emerald);font-family:'Sora',sans-serif;font-weight:600;font-size:.98rem;cursor:pointer;
+    transition:.22s;display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .btn-done:hover{background:linear-gradient(120deg,rgba(16,217,144,.2),rgba(34,211,238,.16));box-shadow:var(--glow-em)}
+  .btn-done.is-done{border-color:var(--zinc);color:var(--txt-dim);background:var(--slate)}
+  .btn-done .chk{font-size:1.05rem}
+
+  footer{text-align:center;margin-top:60px;color:var(--txt-faint);font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.06em}
+  footer .gl{color:var(--emerald)}
+
+  @media (max-width:560px){
+    .wrap{padding:26px 14px 0}
+    .panel-head,.panel-body,.panel-foot{padding-left:22px;padding-right:22px}
+    .nodes{grid-template-columns:1fr}
+  }
+  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.05)}100%{transform:scale(1)}}
+  .node.justdone{animation:pop .4s}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Segurança da Informação · Aula 04 + Autenticação</div>
+    <h1>Fluxograma de Estudo<br><span class="accent">Criptografia & Autenticação</span></h1>
+    <p class="sub">5 fases conectadas, do conceito ao certificado digital. Clique em cada nó para abrir o resumo completo e marque o que já dominou. Tudo o que cai na prova está aqui.</p>
+    <div class="examtag">⚠️ Prova amanhã · só cai conteúdo dos slides · foco total nos nós marcados como <b style="color:var(--amber)">★ PROVA</b></div>
+
+    <div class="progress-bar">
+      <span class="pb-label"><b id="pbCount">0</b> / 19 tópicos dominados</span>
+      <div class="pb-track"><div class="pb-fill" id="pbFill"></div></div>
+      <span class="pb-label" id="pbPct">0%</span>
+      <button class="pb-reset" id="pbReset">↺ zerar progresso</button>
+    </div>
+  </header>
+
+  <main id="flow"></main>
+
+  <footer>built for the grind · <span class="gl">você não está fudido</span> · revise, marque, repita ▘</footer>
+</div>
+
+<!-- SLIDE-OVER -->
+<div class="overlay" id="overlay"></div>
+<aside class="panel" id="panel" role="dialog" aria-modal="true">
+  <div class="panel-bar"></div>
+  <div class="panel-head">
+    <div class="panel-phase" id="pPhase"></div>
+    <div class="panel-title" id="pTitle"></div>
+    <button class="panel-close" id="pClose" aria-label="Fechar">✕</button>
+  </div>
+  <div class="panel-body" id="pBody"></div>
+  <div class="panel-foot">
+    <button class="btn-done" id="pDone"><span class="chk">○</span> <span class="lbl">Marcar como concluído</span></button>
+  </div>
+</aside>
+
+<script>
+/* ===================== DADOS ===================== */
+const PHASES = [
+  {
+    n:"01", title:"Fundamentos Críticos", tag:"Base conceitual",
+    nodes:[
+      { id:"1.1", icon:"⚖️", title:"O Equilíbrio da Criptografia", hint:"Não é mágica — é redução de risco.",
+        phase:"Fase 1 · Fundamentos",
+        body:`<p class="lead">A criptografia <strong>não é uma solução mágica absoluta</strong>. É uma técnica para redução de riscos e defesa no mundo dos bits.</p>
+        <p>A segurança real reside no <strong>equilíbrio perfeito entre técnica, risco e contexto</strong> de implementação. Você escolhe o terreno e a maneira de se defender — não elimina a ameaça, gerencia ela.</p>
+        <div class="callout"><div class="ct">grave isto</div><p>Nenhum sistema real é 100% seguro. Um bom sistema cripto atinge o equilíbrio entre o que é <em>possível</em> e o que é <em>aceitável</em> (risco × custo × impacto).</p></div>
+        <h4>Origem da palavra</h4>
+        <div class="deflist">
+          <div class="def"><span class="k">kriptos</span><span class="v">oculto, escondido</span></div>
+          <div class="def"><span class="k">graphos</span><span class="v">grafia, escrita</span></div>
+        </div>
+        <p style="margin-top:14px">Literalmente: <strong>"arte ou ciência de escrever em cifras"</strong> — transformar informação legível em algo que só quem tem a chave entende.</p>` },
+      { id:"1.2", icon:"📖", title:"Terminologia Essencial", hint:"6 termos que você precisa saber de cor.",
+        phase:"Fase 1 · Fundamentos",
+        body:`<p class="lead">O vocabulário base. Se a prova pedir definição, é daqui.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">Texto claro / simples (plain text)</span><span class="v">A mensagem original, legível.</span></div>
+          <div class="def"><span class="k">Cifração / Criptografia</span><span class="v">Processo de embaralhar a mensagem para ocultar seu conteúdo.</span></div>
+          <div class="def"><span class="k">Texto cifrado (ciphertext)</span><span class="v">A mensagem protegida — o criptograma.</span></div>
+          <div class="def"><span class="k">Decifração / Descriptografia</span><span class="v">Processo inverso: recupera o texto original a partir do criptograma.</span></div>
+          <div class="def"><span class="k">Chave criptográfica</span><span class="v">Parâmetro matemático / segredo de controle usado para cifrar ou decifrar.</span></div>
+          <div class="def"><span class="k">Algoritmo criptográfico</span><span class="v">A transformação matemática que executa a conversão (e o inverso).</span></div>
+        </div>` },
+      { id:"1.3", icon:"🎭", title:"O Trio Clássico", hint:"Alice, Bob e Eva.",
+        phase:"Fase 1 · Fundamentos",
+        body:`<p class="lead">Modelo conceitual de comunicação usado por todos os especialistas — mais "colorido" que dizer emissor/receptor.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">Alice 🅰️</span><span class="v">A origem. Cifra a mensagem.</span></div>
+          <div class="def"><span class="k">Bob 🅱️</span><span class="v">O destino. Decifra a mensagem.</span></div>
+          <div class="def"><span class="k">Eva 👁️</span><span class="v">A intrusa / escuta maliciosa. Tenta interceptar e quebrar a cifra (do inglês <em>eavesdrop</em> = escutar às escondidas).</span></div>
+        </div>` }
+    ]
+  },
+  {
+    n:"02", title:"Criptografia Manual & Histórica", tag:"Antiguidade → idade média",
+    nodes:[
+      { id:"2.1", icon:"📜", title:"Origens & Cifras Hebraicas", hint:"ATBASH, ALBAM, ATBAH + Phaistos.",
+        phase:"Fase 2 · Histórica",
+        body:`<p class="lead">Historicamente, 4 grupos usaram criptografia: <strong>militares, diplomatas, quem guarda memórias e os amantes</strong>.</p>
+        <h4>Disco / Barro de Phaistos</h4>
+        <p>≈ 1600 a.C. — artefato com símbolos <strong>ainda não decifrado</strong> até hoje.</p>
+        <h4>Cifras hebraicas (≈600–500 a.C.)</h4>
+        <p>Substituição simples pelo <strong>alfabeto reverso</strong>. Usadas por escribas hebreus (livro de Jeremias).</p>
+        <div class="deflist">
+          <div class="def"><span class="k">ATBASH</span><span class="v">A 1ª letra (Aleph) vira a última (Taw); a 2ª (Beth) vira a penúltima (Shin). O nome vem dessas letras: Aleph-Taw-Beth-Shin.</span></div>
+          <div class="def"><span class="k">ALBAM</span><span class="v">Variação da substituição hebraica.</span></div>
+          <div class="def"><span class="k">ATBAH</span><span class="v">Outra variação do mesmo princípio.</span></div>
+        </div>` },
+      { id:"2.2", icon:"🪵", title:"Bastão de Licurgo & Crivo de Eratóstenes", hint:"Transposição mecânica + números primos.",
+        phase:"Fase 2 · Histórica",
+        body:`<h4>Bastão de Licurgo (487 a.C.)</h4>
+        <p>Método de <strong>transposição mecânica</strong>. Uma tira de couro é enrolada num bastão de diâmetro específico; escreve-se ao longo dele. Desenrolada, vira uma sequência de letras <strong>sem sentido</strong>. O mensageiro usa a tira como cinto. Só quem tem um bastão de <strong>diâmetro igual</strong> consegue ler de novo.</p>
+        <h4>Crivo de Eratóstenes (≈240 a.C.)</h4>
+        <p>Algoritmo matemático para achar <strong>números primos pequenos</strong>. Lista-se os inteiros e <strong>elimina-se sistematicamente os múltiplos</strong> de cada primo até a <strong>raiz quadrada</strong> do limite (n½). O que sobra sem riscar = primos.</p>
+        <div class="callout"><div class="ct">dica</div><p>Repare: Licurgo é <em>transposição</em> (muda a ordem). O Crivo nem é cifra — é base matemática que reaparece lá na frente no RSA.</p></div>` },
+      { id:"2.3", icon:"🔢", title:"Código de Políbio", hint:"Sistema tomogrâmico — par de coordenadas.", exam:true,
+        phase:"Fase 2 · Histórica",
+        body:`<p class="lead">Cifra de <strong>substituição</strong> do tipo <span class="keytag">sistema tomogrâmico</span>.</p>
+        <p>Cada letra é convertida em um <strong>par de números</strong> que representa suas <strong>coordenadas exatas (linha e coluna)</strong> dentro de uma matriz quadriculada. Originalmente usado como <strong>telégrafo óptico</strong> (tochas indicando os números).</p>
+        <h4>Como funciona</h4>
+        <p>Monta-se uma grade 5×5 com o alfabeto. A letra na linha 2, coluna 3 → vira o par <span class="keytag">23</span>. Decifra-se lendo as coordenadas de volta na grade.</p>
+        <div class="callout"><div class="ct">★ foco na prova</div><p>Palavra-chave: <strong>tomogrâmico</strong> + <strong>par de coordenadas (linha, coluna)</strong> numa matriz. É substituição, não transposição.</p></div>` },
+      { id:"2.4", icon:"🏛️", title:"Cifra de César", hint:"Deslocamento cíclico, chave K=3.", exam:true,
+        phase:"Fase 2 · Histórica",
+        body:`<p class="lead">Cifra <strong>monoalfabética de substituição simples</strong> por <strong>deslocamento cíclico</strong> de posições no alfabeto.</p>
+        <p>A versão padrão usa deslocamento fixo de <strong>3 posições</strong> — a chave <span class="keytag">K = 3</span>.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">A → D</span><span class="v">desloca 3 para frente</span></div>
+          <div class="def"><span class="k">B → E</span><span class="v">desloca 3 para frente</span></div>
+          <div class="def"><span class="k">C → F</span><span class="v">… e assim por diante, voltando ao A depois do Z (cíclico)</span></div>
+        </div>
+        <div class="callout"><div class="ct">★ foco na prova</div><p>Decore: <strong>monoalfabética</strong>, <strong>substituição</strong>, <strong>deslocamento</strong>, <strong>K=3</strong>, <strong>cíclica</strong>. Se mudar a chave (K=5, etc.), só muda o tamanho do deslocamento.</p></div>` }
+    ]
+  },
+  {
+    n:"03", title:"Evolução das Máquinas e Redes", hint:"", tag:"Mecânica → digital → rede",
+    nodes:[
+      { id:"3.1", icon:"⚙️", title:"Criptografia por Máquinas Mecânicas", hint:"Jefferson, Morse, ASCII, Enigma & Turing.",
+        phase:"Fase 3 · Máquinas e Redes",
+        body:`<p class="lead">A transição do papel para o mecanismo.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">Cilindro de Jefferson</span><span class="v">26 discos de madeira giratórios num eixo, cada um com o alfabeto embaralhado.</span></div>
+          <div class="def"><span class="k">Código Morse & Braille</span><span class="v">Sistemas de codificação universalizados (sons / pontos em relevo).</span></div>
+          <div class="def"><span class="k">Código ASCII</span><span class="v">Padronização binária que permitiu trocar dados entre fabricantes diferentes.</span></div>
+          <div class="def"><span class="k">Máquinas de Guerra</span><span class="v">A <strong>Enigma</strong> alemã usava rotores para cifrar. Foi quebrada pelo aparato britânico liderado por <strong>Alan Turing</strong> (com computadores pioneiros como o Heath Robinson e o <strong>Colossus</strong>).</span></div>
+        </div>
+        <div class="callout"><div class="ct">ligação importante</div><p>Enigma = rotores + alemães. Quem quebrou = Turing + Colossus. Esse é o marco do nascimento da computação.</p></div>` },
+      { id:"3.2", icon:"🌐", title:"Criptografia em Rede e Complexidade", hint:"DES, RSA, PGP + fraca vs forte.",
+        phase:"Fase 3 · Máquinas e Redes",
+        body:`<p class="lead">Algoritmos modernos de rede e seus criadores.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">DES</span><span class="v">Desenvolvido pela IBM.</span></div>
+          <div class="def"><span class="k">RSA</span><span class="v">Criado por Rivest, Shamir e Adleman (as iniciais dão o nome).</span></div>
+          <div class="def"><span class="k">PGP</span><span class="v">Criado por Phil Zimmerman.</span></div>
+        </div>
+        <h4>Fraca vs Forte</h4>
+        <div class="deflist">
+          <div class="def"><span class="k">Criptografia fraca</span><span class="v">Fácil de quebrar por análise estatística, mesmo por leigos.</span></div>
+          <div class="def"><span class="k">Criptografia forte</span><span class="v">Alta complexidade matemática, resistente até a supercomputadores.</span></div>
+        </div>` },
+      { id:"3.3", icon:"🗝️", title:"Chaves Públicas vs. Privadas", hint:"Quem guarda o segredo de abertura?",
+        phase:"Fase 3 · Máquinas e Redes",
+        body:`<p class="lead">A diferença está em <strong>quem detém o segredo</strong>.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">Chave Pública</span><span class="v">O método de <strong>cifrar</strong> é distribuído publicamente — qualquer um pode cifrar. Mas o <strong>segredo de abertura</strong> (decifrar) pertence unicamente ao destinatário.</span></div>
+          <div class="def"><span class="k">Chave Privada</span><span class="v">Emissor e receptor <strong>compartilham o mesmo segredo</strong> exclusivo. Só quem tem as instruções diretas codifica e decodifica (simétrica).</span></div>
+        </div>
+        <div class="callout"><div class="ct">não confunda</div><p>Pública = método aberto, abertura secreta (assimétrica). Privada = um único segredo compartilhado (simétrica).</p></div>` },
+      { id:"3.4", icon:"🔀", title:"Classificação das Cifras & Operador XOR", hint:"Código vs Cifra, Transposição vs Substituição, XOR.",
+        phase:"Fase 3 · Máquinas e Redes",
+        body:`<p class="lead">A grande árvore de classificação. Cai em questão de "qual é qual".</p>
+        <h4>Por Código</h4>
+        <p>Substitui <strong>palavras completas ou termos</strong> por símbolos específicos. Ex.: o código indígena <strong>Navajo</strong> usado pelos EUA na 2ª Guerra.</p>
+        <h4>Por Cifra</h4>
+        <p>Transformação minuciosa <strong>caractere por caractere ou bit por bit</strong>. Divide-se em:</p>
+        <div class="deflist">
+          <div class="def"><span class="k">Transposição</span><span class="v">Letras permutadas — muda a ORDEM (ex.: Bastão de Licurgo).</span></div>
+          <div class="def"><span class="k">Substituição</span><span class="v">Troca cada símbolo. Pode ser Monoalfabética (César), Polialfabética (Disco de Alberti) ou Homofônica.</span></div>
+        </div>
+        <h4>Operador XOR (Ou Exclusivo)</h4>
+        <p>Cifra binária moderna: calcula o <strong>XOR lógico</strong> entre os bits do texto claro (em ASCII) e uma <strong>string de bits de chave aleatória</strong>.</p>
+        <div class="callout"><div class="ct">regra do XOR</div><p>Bits iguais → 0; bits diferentes → 1. Aplicar a mesma chave duas vezes devolve o texto original — é o que torna a decifração simples.</p></div>` }
+    ]
+  },
+  {
+    n:"04", title:"Fundamentos de Autenticação", tag:"O 1º filtro de segurança",
+    nodes:[
+      { id:"4.1", icon:"🚪", title:"O Conceito de Autenticação", hint:"Verificar a identidade antes de liberar acesso.",
+        phase:"Fase 4 · Autenticação",
+        body:`<p class="lead">O <strong>primeiro grande filtro de segurança</strong> entre uma entidade externa e o recurso interno.</p>
+        <p>Objetivo: <strong>verificar formalmente a identidade</strong> de um usuário ou sistema <strong>antes de liberar qualquer privilégio</strong>. Garante que entidades não autorizadas fiquem de fora.</p>
+        <p>Usa credenciais como <strong>senha, biometria, token ou certificado digital</strong>.</p>
+        <div class="callout"><div class="ct">frase-chave dos slides</div><p>"Autenticar é abrir a porta certa para a pessoa certa."</p></div>` },
+      { id:"4.2", icon:"🔁", title:"Autenticação de Sistemas", hint:"A validação é mútua (anti-phishing).",
+        phase:"Fase 4 · Autenticação",
+        body:`<p class="lead">A autenticação <strong>não é só do usuário pro sistema</strong> — é mútua.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">Usuário → Sistema</span><span class="v">O usuário precisa saber se o sistema é confiável, para evitar <strong>Phishing</strong> (ex.: um falso Internet Banking).</span></div>
+          <div class="def"><span class="k">Sistema → Componente</span><span class="v">O Sistema Operacional valida a <strong>assinatura e origem</strong> de componentes (ex.: drivers) para garantir integridade.</span></div>
+        </div>` },
+      { id:"4.3", icon:"🆔", title:"Controle de Acesso e Credenciais", hint:"UID, GID e herança de credenciais.",
+        phase:"Fase 4 · Autenticação",
+        body:`<p class="lead">Como o SO associa identidades a privilégios.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">UID (User ID)</span><span class="v">Identificador único de cada usuário.</span></div>
+          <div class="def"><span class="k">GID (Group ID)</span><span class="v">Identificador que agrupa privilégios de vários usuários.</span></div>
+        </div>
+        <p style="margin-top:14px">Os <strong>processos herdam</strong> e agem estritamente sob as credenciais de <strong>quem os invocou</strong>. UID e GID permitem controle de acesso e <strong>auditoria</strong>.</p>` },
+      { id:"4.4", icon:"⏱️", title:"Ciclo da Sessão de Usuário", hint:"Login → processos → ações → logout.",
+        phase:"Fase 4 · Autenticação",
+        body:`<p class="lead">O ciclo de vida rígido de uma sessão.</p>
+        <h4>Fluxo</h4>
+        <p style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:.95rem;background:var(--panel);border:1px solid var(--slate-line);padding:14px;border-radius:11px">Login / Logon  →  sessão estabelecida  →  processos atuam em nome do usuário  →  Logout / Logoff</p>
+        <p style="margin-top:16px">Após o login, a sessão <strong>representa o usuário</strong> dentro do sistema. <strong>Múltiplas sessões isoladas</strong> podem coexistir no mesmo servidor ou desktop simultaneamente.</p>` }
+    ]
+  },
+  {
+    n:"05", title:"Técnicas Avançadas de Acesso", tag:"Fatores, MFA e federação",
+    nodes:[
+      { id:"5.1", icon:"🔐", title:"Os Três Fatores de Autenticação", hint:"SYK, SYH, SYA — combine para somar segurança.", exam:true,
+        phase:"Fase 5 · Acesso Avançado",
+        body:`<p class="lead">A segurança aumenta conforme <strong>combinamos</strong> estes fatores. Sozinhos são mais fracos.</p>
+        <div class="deflist">
+          <div class="def"><span class="k">SYK — Something You Know</span><span class="v"><strong>Algo que você sabe.</strong> Senhas, PINs, perguntas secretas. É o <strong>mais fraco</strong> isoladamente.</span></div>
+          <div class="def"><span class="k">SYH — Something You Have</span><span class="v"><strong>Algo que você tem.</strong> Tokens físicos, chaves criptográficas, smartcards, certificados digitais.</span></div>
+          <div class="def"><span class="k">SYA — Something You Are</span><span class="v"><strong>Algo que você é.</strong> Atributos biométricos nativos: impressão digital, face, íris ou voz.</span></div>
+        </div>
+        <h4>MFA / 2FA</h4>
+        <p>Combinar <strong>fatores diferentes</strong> (ex.: senha SYK + token SYH) = <strong>Multifator (MFA)</strong>, reduzindo drasticamente o risco.</p>
+        <div class="callout"><div class="ct">★ foco na prova</div><p>SYK = sabe · SYH = tem · SYA = é. Cuidado: SYA (biometria) exige coleta, armazenamento e comparação cuidadosa dos dados.</p></div>` },
+      { id:"5.2", icon:"🧩", title:"Senhas, Hash e Senhas Descartáveis", hint:"Hash no login, ataque de dicionário, OTP.",
+        phase:"Fase 5 · Acesso Avançado",
+        body:`<p class="lead">Detalhes práticos do fator SYK que apareceram nos slides.</p>
+        <h4>Hash no login</h4>
+        <p>Login + senha é a técnica <strong>SYK mais comum</strong>. Durante o login, o sistema <strong>calcula o hash</strong> da senha informada e <strong>compara com o hash salvo</strong> — a senha em texto puro não fica guardada.</p>
+        <h4>Ataque de dicionário</h4>
+        <p>Tenta descobrir <strong>senhas fracas</strong> testando palavras comuns e <strong>comparando os hashes</strong> até achar uma correspondência.</p>
+        <h4>Senhas descartáveis (OTP)</h4>
+        <p>Senhas de uso único <strong>reduzem o risco de roubo e reutilização</strong> — mesmo interceptada, a senha já não vale mais.</p>` },
+      { id:"5.3", icon:"🌍", title:"Protocolos e Federação de Identidade", hint:"OAuth, OpenID, SAML, Kerberos, LDAP, RADIUS.",
+        phase:"Fase 5 · Acesso Avançado",
+        body:`<p class="lead">Arquiteturas modernas de autenticação integrada para web e ambientes distribuídos.</p>
+        <h4>Padrões de mercado (web / federação)</h4>
+        <div class="deflist">
+          <div class="def"><span class="k">OAuth</span><span class="v">Autorização delegada de acesso.</span></div>
+          <div class="def"><span class="k">OpenID</span><span class="v">Identidade federada / login único.</span></div>
+          <div class="def"><span class="k">SAML</span><span class="v">Troca de asserções de autenticação entre domínios.</span></div>
+          <div class="def"><span class="k">2FA / MFA</span><span class="v">Arquiteturas integradas de múltiplos fatores.</span></div>
+        </div>
+        <h4>Gerenciamento local & protocolos de rede</h4>
+        <div class="deflist">
+          <div class="def"><span class="k">Frameworks locais</span><span class="v">PAM, NSS.</span></div>
+          <div class="def"><span class="k">Protocolos de rede</span><span class="v">Kerberos, LDAP e RADIUS.</span></div>
+        </div>
+        <div class="callout"><div class="ct">como decorar</div><p>Web/federação: <strong>OAuth, OpenID, SAML</strong>. Rede/local: <strong>Kerberos, LDAP, RADIUS, PAM, NSS</strong>.</p></div>` }
+    ]
+  }
+];
+
+/* ===================== RENDER ===================== */
+const flow = document.getElementById('flow');
+let TOTAL = 0;
+const done = {}; // estado em memória
+
+const arrow = `<div class="connector"><svg width="22" height="34" viewBox="0 0 22 34" fill="none"><path d="M11 0 V26" stroke="var(--slate-line)" stroke-width="2"/><path d="M4 22 L11 31 L18 22" stroke="var(--slate-line)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+
+PHASES.forEach((ph, pi) => {
+  const sec = document.createElement('section');
+  sec.className = 'phase';
+  let nodesHtml = '';
+  ph.nodes.forEach(nd => {
+    TOTAL++;
+    nodesHtml += `
+      <button class="node${nd.exam?' exam':''}" data-id="${nd.id}">
+        ${nd.exam?'<span class="exam-flag">★ PROVA</span>':''}
+        <div class="node-top">
+          <span class="node-id">${nd.id}</span>
+          <span class="node-icon">${nd.icon}</span>
+        </div>
+        <div class="node-title">${nd.title}</div>
+        <div class="node-hint">${nd.hint}</div>
+        <div class="node-state"><span class="dot"></span><span class="st-label">a estudar</span></div>
+      </button>`;
+  });
+  sec.innerHTML = `
+    <div class="phase-head">
+      <div class="phase-num">${ph.n}</div>
+      <div class="phase-title">${ph.title}<small>Fase ${ph.n} · ${ph.tag}</small></div>
+      <div class="phase-line"></div>
+    </div>
+    <div class="nodes">${nodesHtml}</div>`;
+  flow.appendChild(sec);
+  if (pi < PHASES.length-1){ const c=document.createElement('div'); c.innerHTML=arrow; flow.appendChild(c.firstElementChild); }
+});
+
+document.getElementById('pbCount').nextSibling; // noop
+const totalEl = document.querySelector('.pb-label b');
+document.querySelectorAll('.pb-label')[0].innerHTML = `<b id="pbCount">0</b> / ${TOTAL} tópicos dominados`;
+
+/* lookup */
+const NODE = {};
+PHASES.forEach(p=>p.nodes.forEach(n=>NODE[n.id]=n));
+
+/* ===================== MODAL ===================== */
+const overlay=document.getElementById('overlay');
+const panel=document.getElementById('panel');
+const pPhase=document.getElementById('pPhase');
+const pTitle=document.getElementById('pTitle');
+const pBody=document.getElementById('pBody');
+const pDone=document.getElementById('pDone');
+let current=null;
+
+function openNode(id){
+  const nd=NODE[id]; current=id;
+  pPhase.textContent=nd.phase;
+  pTitle.textContent=nd.title;
+  pBody.innerHTML=nd.body;
+  pBody.scrollTop=0;
+  syncBtn();
+  overlay.classList.add('open');
+  panel.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeNode(){
+  overlay.classList.remove('open');
+  panel.classList.remove('open');
+  document.body.style.overflow='';
+  current=null;
+}
+function syncBtn(){
+  const isDone=!!done[current];
+  pDone.classList.toggle('is-done',isDone);
+  pDone.querySelector('.chk').textContent=isDone?'✓':'○';
+  pDone.querySelector('.lbl').textContent=isDone?'Concluído — clique para desmarcar':'Marcar como concluído';
+}
+function toggleDone(){
+  done[current]=!done[current];
+  const card=document.querySelector(`.node[data-id="${current}"]`);
+  card.classList.toggle('done',done[current]);
+  card.querySelector('.st-label').textContent=done[current]?'dominado':'a estudar';
+  if(done[current]){card.classList.add('justdone');setTimeout(()=>card.classList.remove('justdone'),400);}
+  syncBtn();
+  updateProgress();
+}
+function updateProgress(){
+  const c=Object.values(done).filter(Boolean).length;
+  const pct=Math.round(c/TOTAL*100);
+  document.getElementById('pbCount').textContent=c;
+  document.getElementById('pbFill').style.width=pct+'%';
+  document.getElementById('pbPct').textContent=pct+'%';
+}
+
+flow.addEventListener('click',e=>{const b=e.target.closest('.node');if(b)openNode(b.dataset.id);});
+pDone.addEventListener('click',toggleDone);
+document.getElementById('pClose').addEventListener('click',closeNode);
+overlay.addEventListener('click',closeNode);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)closeNode();});
+document.getElementById('pbReset').addEventListener('click',()=>{
+  Object.keys(done).forEach(k=>delete done[k]);
+  document.querySelectorAll('.node.done').forEach(n=>{n.classList.remove('done');n.querySelector('.st-label').textContent='a estudar';});
+  updateProgress();
+});
+</script>
+</body>
+</html>
